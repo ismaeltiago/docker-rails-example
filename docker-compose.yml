@@ -1,0 +1,30 @@
+version: "3.7"
+
+services:
+  foo_postgres:
+    image: postgres:15.0-alpine
+    container_name: foo_postgres
+    volumes:
+      - ./docker/db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=password
+
+  foo_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: /bin/bash
+    image: foo_app
+    container_name: foo_app
+    tty: true
+    volumes:
+      - .:/foo_app
+    ports:
+      - 3000:3000
+    depends_on:
+      - foo_postgres
+    environment:
+      - DATABASE_NAME=foo_development
+      - DATABASE_HOST=foo_postgres
